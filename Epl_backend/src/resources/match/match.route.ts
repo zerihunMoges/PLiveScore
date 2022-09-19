@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { addEvent, addMatch, getMatch, getMatches } from './match.controller'
+import { addEvent, addMatch, getMatches } from './match.controller'
 
 const matchRouter = Router()
 
 matchRouter.get('', getMatches)
-matchRouter.get('/:id', getMatch)
+matchRouter.get('/:id', getMatches)
 matchRouter.put('/bulk', addMatch)
 matchRouter.put('event/:match', addEvent)
 
