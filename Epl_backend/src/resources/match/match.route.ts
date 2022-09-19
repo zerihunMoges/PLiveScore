@@ -4,6 +4,7 @@ import { addEvent, addMatch, getMatches } from './match.controller'
 const matchRouter = Router()
 
 matchRouter.get('', getMatches)
+matchRouter.get('/:id', getMatches)
 matchRouter.put('/bulk', addMatch)
 matchRouter.put('event/:match', addEvent)
 

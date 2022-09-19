@@ -68,7 +68,7 @@ export async function addMatch(req, res, next) {
 export async function addEvent(req, res, next) {
   try {
     const { id } = req.params
-    const { events } = req.body
+    const { events, line } = req.body
 
     const match = await Match.findOne({ opId: id })
     if (!match) {
@@ -111,4 +111,19 @@ export async function getMatches(req, res, next) {
     }
   ])
   res.status(200).json(matches)
+}
+
+export async function getMatch(req, res, next) {
+  try {
+    const { id } = req.params
+    const match = await Match.findOne({ opId: id })
+    if (match) {
+      res.status(200).json(match)
+      return
+    } else {
+      return res.status(404)
+    }
+  } catch (err) {
+    res.status(500).json({ messsage: err.messsage })
+  }
 }
