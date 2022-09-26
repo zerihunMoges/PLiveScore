@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import { Club } from '../club/club.model'
+import { Coach } from '../coach/coach.model'
 
 interface periods {
   first: number | undefined
@@ -51,6 +53,47 @@ interface coach {
   photo: string
 }
 
+interface lineup {
+  startXI: [squad]
+  formation: string
+  substitutes: [squad]
+  coach: mongoose.Types.ObjectId
+}
+
+interface lineups {
+  home: lineup
+  away: lineup
+}
+
+const LineupSchema = new mongoose.Schema({
+  team: {
+    type: mongoose.Types.ObjectId,
+    ref: Club
+  },
+  startXI: {
+    type: []
+  },
+  formation: {
+    type: String
+  },
+  substitutes: {
+    type: []
+  },
+  coach: {
+    type: mongoose.Types.ObjectId,
+    ref: Coach
+  }
+})
+
+const LineupsSchema = new mongoose.Schema({
+  home: {
+    type: LineupSchema
+  },
+  away: {
+    type: LineupSchema
+  }
+})
+
 export interface IMatchInterface {
   opId: string
   timezone: string
@@ -66,11 +109,8 @@ export interface IMatchInterface {
   score: score
   goals: goals
   round: string
-  event: [event]
-  startXI: [squad]
-  formation: string
-  substitutes: [squad]
-  coach: mongoose.Types.ObjectId
+  events: [event]
+  lineups: lineups
 }
 
 const MatchSchema = new mongoose.Schema({
@@ -117,26 +157,17 @@ const MatchSchema = new mongoose.Schema({
   round: {
     type: String
   },
-  event: {
+  events: {
     type: [Object]
   },
-  startXI: {
-    type: [Object]
+  lineups: {
+    type: LineupsSchema
   },
-  formation: {
-    type: String
-  },
-  substitutes: {
-    type: [Object]
-  },
+
   venue: {
     type: mongoose.Types.ObjectId,
     ref: 'Venue',
     required: true
-  },
-  coach: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Coach'
   }
 })
 
