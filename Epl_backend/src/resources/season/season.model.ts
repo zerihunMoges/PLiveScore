@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 export interface ISeasonInterface {
   year: string
   opId: string
+  league: mongoose.Types.ObjectId
+  rounds: []
 }
 
 export const SeasonSchema = new mongoose.Schema({
@@ -11,6 +13,12 @@ export const SeasonSchema = new mongoose.Schema({
   },
   opId: {
     type: String
+  },
+  league: {
+    type: mongoose.Types.ObjectId
+  },
+  rounds: {
+    type: []
   }
 })
 
