@@ -1,29 +1,30 @@
-import { useNavigate } from 'react-router'
-import './fixture.css'
-function Fixture() {
-  const navigate = useNavigate()
-  return (
-    <div
-      className="Fixture"
-      onClick={() => {
-        navigate('/match')
-      }}
-    >
-      <div className="FixtureTeam">
-        <h1> Newcastle</h1>
-        <img src={require('./3newcastel.png')} alt="" />
-      </div>
+import React, { useContext } from 'react'
+import { FixturesContext } from '../../matchcontext/fixturescontext'
+import useMatches from '../../queryhooks/useMatches'
+import Fixture from './fixture'
 
-      <div className="FixtureTime">
-        <h1>6:30</h1>
-        <h2> 30 OCT</h2>
-      </div>
-      <div className="FixtureTeam">
-        <img src={require('./bourn.png')} alt="" />
-        <h1> Bournemouth</h1>
-      </div>
+export default function Fixtures() {
+  //   const [Fixtures, setFixtures] = useContext(FixturesContext)
+  console.log('got here')
+  const fixtures = useMatches()
+  console.log(fixtures)
+  return (
+    <div className="Fixtures">
+      {fixtures.isLoading ? (
+        <p>isLoading .....</p>
+      ) : (
+        fixtures.map((fixture, index) => {
+          return (
+            <Fixture
+              homeTeam={fixture.homeTeam}
+              awayTeam={fixture.awayTeam}
+              status={fixture.status}
+              date={fixture.date}
+              goals={fixture.goals}
+            />
+          )
+        })
+      )}
     </div>
   )
 }
-
-export default Fixture

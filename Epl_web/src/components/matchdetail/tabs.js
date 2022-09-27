@@ -1,4 +1,5 @@
-import * as React from 'react'
+import React, { useContext, useState } from 'react'
+
 import PropTypes from 'prop-types'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
@@ -16,6 +17,7 @@ import LaptopMacIcon from '@mui/icons-material/LaptopMac'
 import HotelIcon from '@mui/icons-material/Hotel'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import Lineup from '../lineup/lineup'
+import { MatchContext } from '../../matchcontext/matchcontext'
 
 export function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -51,13 +53,16 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs() {
-  const [value, setValue] = React.useState(0)
+  const [value, setValue] = useState(0)
+  const [match, setMatch] = useContext(MatchContext)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-
-  return (
+  const { data, status } = match
+  return status === 'loading' ? (
+    <p>Loading ...</p>
+  ) : (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
