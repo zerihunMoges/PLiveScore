@@ -118,34 +118,64 @@ export async function updateMatch(req, res, next) {
   }
 }
 export async function getMatches(req, res, next) {
-  const matches = await Match.find({}).populate([
-    {
-      path: 'season',
-      model: Season,
-      select: '-__v'
-    },
-    {
-      path: 'homeTeam',
-      model: Club,
-      select: '-__v'
-    },
-    {
-      path: 'awayTeam',
-      model: Club,
-      select: '-__v'
-    },
-    {
-      path: 'league',
-      model: League,
-      select: '-__v'
-    },
-    {
-      path: 'venue',
-      model: Venue,
-      select: '-__v'
+  var { round, from, to, limit, page } = req.query
+  limit = limit ? limit : 10
+  page = page ? page : 1
+
+  // const days = {'Monday':0, 'Tuseday':1, 'Wedensday':2, 'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6}
+  const dateFinder = {
+    $gt: from ? new Date(from).toJSON() : new Date().toJSON(),
+    $lt: to
+      ? new Date(to).toJSON()
+      : new Date(
+          new Date().getFullYear() + 1,
+          new Date().getMonth(),
+          new Date().getDate()
+        ).toJSON()
+  }
+
+  const finder = {
+    date: dateFinder,
+    round: round || {
+      $ne: 0
     }
-  ])
-  res.status(200).json(matches)
+  }
+  const estimate = await Match.find(finder).count()
+  const matches = await Match.find(finder)
+    .sort({ date: 'asc' })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate([
+      {
+        path: 'season',
+        model: Season,
+        select: '-__v'
+      },
+      {
+        path: 'homeTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'awayTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'league',
+        model: League,
+        select: '-__v'
+      },
+      {
+        path: 'venue',
+        model: Venue,
+        select: '-__v'
+      }
+    ])
+  res.status(200).json({
+    hasNext: Math.ceil(estimate / limit) > page,
+    data: matches
+  })
 }
 
 export async function getMatch(req, res, next) {
@@ -197,13 +227,95 @@ export async function getMatch(req, res, next) {
         ]
       }
     ])
+
     if (match) {
       res.status(200).json(match)
       return
     } else {
-      return res.status(404)
+      res.status(404)
+      return
     }
   } catch (err) {
     res.status(500).json({ messsage: err.messsage })
+    return
   }
+}
+
+export async function getResult(req, res, next) {
+  var { round, from, to, limit, page } = req.query
+  limit = limit ? limit : 10
+  page = page ? page : 1
+
+  const estimate = await Match.find({ 'status.short': 'FT' }).count()
+  const matches = await Match.find({ 'status.short': 'FT' })
+    .sort({ date: 'desc' })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate([
+      {
+        path: 'season',
+        model: Season,
+        select: '-__v'
+      },
+      {
+        path: 'homeTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'awayTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'league',
+        model: League,
+        select: '-__v'
+      },
+      {
+        path: 'venue',
+        model: Venue,
+        select: '-__v'
+      }
+    ])
+  res.status(200).json({
+    hasNext: Math.ceil(estimate / limit) > page,
+    data: matches
+  })
+}
+
+export async function getLiveMatches(req, res, next) {
+  const matches = await Match.find({
+    'status.short': { $in: ['1H', '2H', 'P', 'ET', 'BT', 'HT'] }
+  })
+    .sort({ date: 'desc' })
+    .populate([
+      {
+        path: 'season',
+        model: Season,
+        select: '-__v'
+      },
+      {
+        path: 'homeTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'awayTeam',
+        model: Club,
+        select: '-__v'
+      },
+      {
+        path: 'league',
+        model: League,
+        select: '-__v'
+      },
+      {
+        path: 'venue',
+        model: Venue,
+        select: '-__v'
+      }
+    ])
+
+  res.status(200).json(matches)
 }

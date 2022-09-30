@@ -14,7 +14,6 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(urlencoded({ extended: true }))
-
 app.use('/api/club', clubRouter)
 app.use('/api/matches', matchRouter)
 
