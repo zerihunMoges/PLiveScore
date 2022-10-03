@@ -150,7 +150,7 @@ export async function getFixture(id) {
   }
 }
 
-// schedule(updateAllMatches, 1)
+schedule(updateAllMatches, 1)
 
 if (fixtures == undefined) {
   async function runFixture() {

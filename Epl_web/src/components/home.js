@@ -18,11 +18,13 @@ import { FixturesContext } from '../matchcontext/fixturescontext'
 import UpdateFixtures from '../helper/test'
 import { FixturesPageContext } from '../matchcontext/fixturespagecontext'
 import { useIsFetching } from 'react-query'
+import { useLiveMatches } from '../queryhooks/useLiveMatches'
 const pageNumber = 1
 function Home() {
   const [fixtures, setFixtures] = useContext(FixturesContext)
   const [page, setPage] = useContext(FixturesPageContext)
   var prevDate
+  const liveMatches = useLiveMatches()
   const {
     isLoading,
     isSuccess,
@@ -54,17 +56,24 @@ function Home() {
 
   return (
     <div className="main">
-      <h1 className="LiveMatchesHeader">Live Matches</h1>
+      {liveMatches.data ? (
+        <h1 className="LiveMatchesHeader">Live Matches</h1>
+      ) : null}
       <div className="LiveMatches">
-        <Match />
-        <Match />
-        <Match />
-        <Match />
-        <Match />
-        <Match />
-        <Match />
+        {liveMatches.data?.map((match, index) => {
+          return (
+            <Match
+              key={index}
+              homeTeam={match.homeTeam}
+              awayTeam={match.awayTeam}
+              goals={match.goals}
+              status={match.status}
+              venue={match.venue}
+            />
+          )
+        })}
       </div>
-      <h2 className="LiveMatchesHeader">Today's Matches</h2>
+
       <div className="Fixtures">
         {data?.pages.map((page, i) =>
           page.data.map((match) => {
