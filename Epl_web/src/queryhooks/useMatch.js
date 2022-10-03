@@ -3,7 +3,7 @@ import { useQuery } from 'react-query'
 const fetchMatch = (matchId) => {
   console.log(`https://epl-update.onrender.com/api/matches/${matchId}`)
   return axios
-    .get(`https://epl-update.onrender.com/api/matches/${matchId}`)
+    .get(`http://localhost:8000/api/matches/${matchId}`)
     .then((res) => res.data)
 }
 
