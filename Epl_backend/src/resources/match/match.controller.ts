@@ -124,7 +124,13 @@ export async function getMatches(req, res, next) {
 
   // const days = {'Monday':0, 'Tuseday':1, 'Wedensday':2, 'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6}
   const dateFinder = {
-    $gt: from ? new Date(from).toJSON() : new Date().toJSON(),
+    $gt: from
+      ? new Date(from).toJSON()
+      : new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          new Date().getDate()
+        ).toJSON(),
     $lt: to
       ? new Date(to).toJSON()
       : new Date(

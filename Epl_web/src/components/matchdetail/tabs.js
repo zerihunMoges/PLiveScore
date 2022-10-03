@@ -18,7 +18,9 @@ import HotelIcon from '@mui/icons-material/Hotel'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import Lineup from '../lineup/lineup'
 import { MatchContext } from '../../matchcontext/matchcontext'
-
+import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
+import SportsIcon from '@mui/icons-material/Sports'
+import SwitchLeftIcon from '@mui/icons-material/SwitchLeft'
 export function TabPanel(props) {
   const { children, value, index, ...other } = props
 
@@ -52,15 +54,20 @@ function a11yProps(index) {
   }
 }
 
-export default function BasicTabs() {
+export default function BasicTabs({ match }) {
   const [value, setValue] = useState(0)
-  const [match, setMatch] = useContext(MatchContext)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-  const { data, status } = match
-  return status === 'loading' ? (
+  const icons = {
+    Goal: <SportsSoccerIcon />,
+    Card: <SportsIcon />,
+    subst: <SwitchLeftIcon />
+  }
+  return !match ? (
+    <p>wait</p>
+  ) : match.status === 'loading' ? (
     <p>Loading ...</p>
   ) : (
     <Box sx={{ width: '100%' }}>
@@ -68,97 +75,67 @@ export default function BasicTabs() {
         <Tabs
           value={value}
           onChange={handleChange}
-          aria-label="basic tabs example"
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
         >
           <Tab label="Statistics" {...a11yProps(0)} />
           <Tab label="TimeLine" {...a11yProps(1)} />
-          <Tab label="Lineups" {...a11yProps(2)} />
+          <Tab label={`${match.data.homeTeam.name} Lineup`} {...a11yProps(2)} />
+          <Tab label={`${match.data.awayTeam.name} Lineup`} {...a11yProps(3)} />
         </Tabs>
       </Box>
+
       <TabPanel value={value} index={1}>
-        <Timeline position="alternate">
-          <TimelineItem>
-            <TimelineOppositeContent
-              sx={{ m: 'auto 0' }}
-              align="right"
-              variant="body2"
-              color="text.secondary"
-            >
-              9:30 am
-            </TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineConnector />
-              <TimelineDot>
-                <FastfoodIcon />
-              </TimelineDot>
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent sx={{ py: '12px', px: 2 }}>
-              <Typography variant="h6" component="span">
-                Eat
-              </Typography>
-              <Typography>Because you need strength</Typography>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent
-              sx={{ m: 'auto 0' }}
-              variant="body2"
-              color="text.secondary"
-            >
-              10:00 am
-            </TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineConnector />
-              <TimelineDot color="primary">
-                <LaptopMacIcon />
-              </TimelineDot>
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent sx={{ py: '12px', px: 2 }}>
-              <Typography variant="h6" component="span">
-                Code
-              </Typography>
-              <Typography>Because it&apos;s awesome!</Typography>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineConnector />
-              <TimelineDot color="primary" variant="outlined">
-                <HotelIcon />
-              </TimelineDot>
-              <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
-            </TimelineSeparator>
-            <TimelineContent sx={{ py: '12px', px: 2 }}>
-              <Typography variant="h6" component="span">
-                Sleep
-              </Typography>
-              <Typography>Because you need rest</Typography>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
-              <TimelineDot color="secondary">
-                <RepeatIcon />
-              </TimelineDot>
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent sx={{ py: '12px', px: 2 }}>
-              <Typography variant="h6" component="span">
-                Repeat
-              </Typography>
-              <Typography>Because this is the life you love!</Typography>
-            </TimelineContent>
-          </TimelineItem>
+        <Timeline position="alternate" sx={{ fontSize: '5%' }}>
+          {match.data.events.map((event, index) => {
+            return (
+              <TimelineItem>
+                <TimelineOppositeContent
+                  sx={{ m: 'auto 0' }}
+                  align="right"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {event.time.elapsed}
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineConnector />
+                  <TimelineDot>{icons[event.type]}</TimelineDot>
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent sx={{ py: '12px', px: 2 }}>
+                  <Typography variant="h6" component="span">
+                    {event.type}
+                  </Typography>
+                  <Typography>{event.player.name}</Typography>
+                </TimelineContent>
+              </TimelineItem>
+            )
+          })}
         </Timeline>
       </TabPanel>
+
       <TabPanel value={value} index={0}>
         Coming Soon!
       </TabPanel>
+
       <TabPanel value={value} index={2}>
-        <Lineup />
+        <Lineup
+          startXI={match.data.lineups.home.startXI}
+          substitutes={match.data.lineups.home.substitutes}
+          formation={match.data.lineups.home.formation}
+          coach={match.data.lineups.home.coach}
+        />
+      </TabPanel>
+
+      <TabPanel value={value} index={3}>
+        <Lineup
+          startXI={match.data.lineups.away.startXI}
+          substitutes={match.data.lineups.away.substitutes}
+          formation={match.data.lineups.away.formation}
+          coach={match.data.lineups.away.coach}
+        />
       </TabPanel>
     </Box>
   )

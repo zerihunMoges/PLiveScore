@@ -15,47 +15,89 @@ function MatchDetail() {
   const [match, setMatch] = useContext(MatchContext)
   const { id } = useParams()
   const m = useMatch(id)
-  useEffect(() => {
-    setMatch(m)
-  })
+
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
   const { data, status } = m
 
   return (
-    <div className="main">
+    <div>
       {status === 'loading' ? (
         <p>Loading</p>
-      ) : (
-        <div className="LiveMatch">
-          <div className="LiveMatchHeader">
-            <h1>{data.league.name}</h1>
-            <h2>{data.round}</h2>
+      ) : status === 'success' ? (
+        <div className="main">
+          <div className="match">
+            <div className="match-header">
+              <div className="match-status">{data.status.long}</div>
+              <div className="match-tournament">
+                <img src={data.league.logo} />
+                {data.league.name}
+              </div>
+              <div className="match-actions">
+                {/* <button className="btn-icon">
+            <i className="material-icons-outlined">grade</i>
+          </button>
+          <button className="btn-icon">
+            <i className="material-icons-outlined">add_alert</i>
+          </button> */}
+              </div>
+            </div>
+            <div className="match-content">
+              <div className="column">
+                <div className="team team--home">
+                  <div className="team-logo">
+                    <img src={data.homeTeam.logo} />
+                  </div>
+                  <h2 className="team-name">{data.homeTeam.name}</h2>
+                </div>
+              </div>
+              <div className="column">
+                <div className="match-details">
+                  <div className="match-date">
+                    <span>
+                      {new Date(data.date).toDateString().slice(0, 10)} at{' '}
+                      {new Date(data.date).toTimeString().slice(0, 5)}
+                    </span>
+                  </div>
+                  <div className="match-score">
+                    <span className="match-score-number match-score-number--leading">
+                      {data.goals.home}
+                    </span>
+                    <span className="match-score-divider">:</span>
+                    <span className="match-score-number">
+                      {data.goals.away}
+                    </span>
+                  </div>
+                  <div className="match-time-lapsed">
+                    {data.status.elapsed} mins
+                  </div>
+                  <div className="match-referee">
+                    Referee: <strong>Mike dean</strong>
+                  </div>
+                  {/* <div className="match-bet-options">
+              <button className="match-bet-option">1.48</button>
+              <button className="match-bet-option">7.84</button>
+              <button className="match-bet-option">3.24</button>
+            </div>
+            <button className="match-bet-place">Place a bet</button> */}
+                </div>
+              </div>
+              <div className="column">
+                <div className="team team--away">
+                  <div className="team-logo">
+                    <img src={data.awayTeam.logo} />
+                  </div>
+                  <h2 className="team-name"> {data.awayTeam.name}</h2>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="LiveMatchDetail">
-            <div className="LiveMatchTeam">
-              <img src={data.homeTeam.logo} alt="" />
-              <h1> {data.homeTeam.name}</h1>
-              <h2>Home</h2>
-            </div>
-            <div className="LiveMatchScore">
-              <h1>
-                <span>{data.goals.home}</span>
-                <span>:</span> <span>{data.goals.away}</span>
-              </h1>
-              <h2> {data.status.elapsed} min</h2>
-            </div>
-            <div className="LiveMatchTeam">
-              <img src={data.awayTeam.logo} alt="" />
-              <h1> {data.awayTeam.name}</h1>
-              <h2>Away</h2>
-            </div>
-          </div>
+          <BasicTabs match={m} />
         </div>
+      ) : (
+        <p>Wait </p>
       )}
-      <BasicTabs />
     </div>
   )
 }

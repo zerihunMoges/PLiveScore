@@ -61,7 +61,7 @@ export async function updateTodaysMatch() {
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': 'c9c24aaae1msh17bea5214a85e53p1cee32jsn7cdd2fca8933',
+        'X-RapidAPI-Key': '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
         'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
       }
     }
@@ -88,7 +88,7 @@ export async function getFixture(id) {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key':
-            'c9c24aaae1msh17bea5214a85e53p1cee32jsn7cdd2fca8933',
+            '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
           'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
         }
       }
@@ -107,7 +107,7 @@ export async function getFixture(id) {
           venue,
           status
         } = fixture
-
+        console.log(teams.home.name)
         const res = await fetch(`${configs.api}/api/matches`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -138,21 +138,19 @@ export async function getFixture(id) {
         } else if (status.short == 'NS') {
           const dif = new Date(date).getTime() - new Date().getTime()
           const time = dif
-          schedule(getFixture, time, id)
+          schedule(getFixture, Math.max(time, 30000), id)
         } else if (inprogress.has(status.short)) {
           const time = 60000
           schedule(getFixture, time, id)
         }
       })
-    }
-
-    return data
+    } else return data
   } catch (err) {
     console.log(err)
   }
 }
 
-schedule(updateAllMatches, 1)
+// schedule(updateAllMatches, 1)
 
 if (fixtures == undefined) {
   async function runFixture() {

@@ -18,7 +18,7 @@ function LiveMatch(props) {
 
       <div className="LiveMatchDetail">
         <div className="LiveMatchTeam">
-          <img src={require('./3newcastel.png')} alt="" />
+          {/* <img src={require('./3newcastel.png')} alt="" /> */}
           <h1> Newcastle</h1>
           <h2>Home</h2>
         </div>
@@ -29,7 +29,7 @@ function LiveMatch(props) {
           <h2> 83 min</h2>
         </div>
         <div className="LiveMatchTeam">
-          <img src={require('./bourn.png')} alt="" />
+          {/* <img src={require('./bourn.png')} alt="" /> */}
           <h1> Bournemouth</h1>
           <h2>Away</h2>
         </div>

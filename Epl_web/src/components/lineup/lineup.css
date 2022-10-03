@@ -1,0 +1,12 @@
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lineups {
+  display: flex;
+}
+
+.lineup {
+  width: 50%;
+}
