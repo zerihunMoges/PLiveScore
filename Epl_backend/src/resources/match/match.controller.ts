@@ -8,7 +8,16 @@ import { Coach } from '../coach/coach.model'
 export async function updateMatch(req, res, next) {
   try {
     const { match } = req.body
-    const { fixture, league, teams, goals, score, lineups, events } = match
+    const {
+      fixture,
+      league,
+      teams,
+      goals,
+      score,
+      lineups,
+      events,
+      statistics
+    } = match
     const { id, referee, timezone, date, timestamp, periods, venue, status } =
       fixture
     let homeTeam
@@ -53,29 +62,22 @@ export async function updateMatch(req, res, next) {
         }
       }
     }
-    console.log('home away')
-    console.log(away)
-    let result = await Match.findOneAndUpdate(
-      { opId: id },
-      {
-        referee,
 
-        goals,
-        score,
-        timezone,
+    let result = await Match.findOne({ opId: id })
+    if (result) {
+      result.referee = referee
+      result.goals = goals
+      result.score = score
+      result.timezone = timezone
+      result.date = date
+      result.periods = periods
+      result.round = league.round
+      result.status = status
+      result.lineups = home.startXI ? { home, away } : result.lineups
+      result.events = events ? events : result.events
+      result.save()
+    }
 
-        date,
-        timestamp,
-        periods,
-        round: league.round,
-        status,
-        lineups: {
-          home,
-          away
-        },
-        events
-      }
-    )
     if (!result) {
       homeTeam = homeTeam
         ? await Club.findOne({ opId: teams.home.id })
@@ -108,7 +110,8 @@ export async function updateMatch(req, res, next) {
           home,
           away
         },
-        events
+        events,
+        statistics
       })
     }
 
