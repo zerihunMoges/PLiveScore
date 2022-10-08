@@ -64,6 +64,10 @@ interface lineups {
   home: lineup
   away: lineup
 }
+interface stat {
+  type: string
+  value: number
+}
 
 const LineupSchema = new mongoose.Schema({
   team: {
@@ -111,6 +115,7 @@ export interface IMatchInterface {
   round: string
   events: [event]
   lineups: lineups
+  statistics: [stat]
 }
 
 const MatchSchema = new mongoose.Schema({
@@ -163,7 +168,9 @@ const MatchSchema = new mongoose.Schema({
   lineups: {
     type: LineupsSchema
   },
-
+  statistics: {
+    type: [Object]
+  },
   venue: {
     type: mongoose.Types.ObjectId,
     ref: 'Venue',
