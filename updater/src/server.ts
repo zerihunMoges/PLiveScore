@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import { configs } from './configs'
 import { schedule } from './schedulers/schedulers'
 import { results } from './results'
+import { Console } from 'console'
 
 const fetch = require('node-fetch')
 
@@ -22,8 +23,8 @@ export async function updateAllMatches() {
     .then((res) => res.json())
     .then(async (data) => {
       configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
-      const { errors, paging, response } = data
-      if (!errors || errors.length == 0) {
+      const { errors, paging, response, message } = data
+      if (!message && (!errors || errors.length == 0)) {
         for (const match of response) {
           const res = await fetch(`${configs.api}/api/matches`, {
             method: 'PUT',
@@ -37,6 +38,7 @@ export async function updateAllMatches() {
 
           await new Promise((r) => setTimeout(r, 1000))
         }
+
         var today = new Date()
         var tomorrow = new Date(
           today.getFullYear(),
@@ -69,8 +71,27 @@ export async function updateTodaysMatch() {
   ).then(async (res) => await res.json())
 
   configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
+  const { message, errors, response } = data
 
-  return data
+  if (!message && (!errors || errors.length == 0)) {
+    response.forEach(async (match) => {
+      const matchTime = new Date(match.fixture.date).getTime()
+      const hour = 3600000
+      schedule(getFixture, 1, match.fixture.id)
+    })
+    var today = new Date()
+    var tomorrow = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1
+    )
+    var dif = tomorrow.getTime() - today.getTime()
+    schedule(updateTodaysMatch, dif)
+  } else {
+    const minute = 60000
+    console.log(data)
+    schedule(updateTodaysMatch, 10 * minute)
+  }
 }
 
 export async function getFixture(id) {
@@ -85,7 +106,8 @@ export async function getFixture(id) {
         }
       }
     ).then(async (res) => await res.json())
-    configs.tokenIdx = (configs.tokenIdx + 1) % 10
+
+    configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
     if (!data.errors || data.errors.length == 0) {
       await data.response.forEach(async (match) => {
         const { fixture, league, teams, goals, score, lineups, events } = match
@@ -133,12 +155,15 @@ export async function getFixture(id) {
         } else if (status.short == 'NS') {
           const dif = new Date(date).getTime() - new Date().getTime()
           const time = dif
-          if (lineups.home && lineups.home.startXI) {
+          console.log(lineups)
+          if (lineups.length != 0) {
             schedule(getFixture, Math.max(time, 30000), id)
           } else {
             console.log('rescheduled' + teams.home.name)
             const fiveMins = 300000
-            schedule(getFixture, fiveMins, id)
+            const hour = 3600000
+            const dif = new Date(date).getTime() - hour - new Date().getTime()
+            schedule(getFixture, Math.max(fiveMins, dif), id)
           }
         } else if (inprogress.has(status.short)) {
           const time = 60000
@@ -154,29 +179,8 @@ export async function getFixture(id) {
 }
 
 async function main() {
-  schedule(updateAllMatches, 1)
-  const { errors, paging, response } = await schedule(updateTodaysMatch, 1)
-
-  configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
-  if (!errors.message) {
-    response.forEach(async (match) => {
-      const matchTime = new Date(match.fixture.date).getTime()
-      const hour = 3600000
-
-      if (matchTime - new Date().getTime() <= hour) {
-        schedule(getFixture, 1, match.fixture.id)
-      } else {
-        schedule(
-          getFixture,
-          matchTime - new Date().getTime() - hour,
-          match.fixture.id
-        )
-      }
-    })
-  } else {
-    const hour = 360000
-    schedule(main, hour)
-  }
+  // schedule(updateAllMatches, 1)
+  schedule(updateTodaysMatch, 1)
 }
 
 main()
