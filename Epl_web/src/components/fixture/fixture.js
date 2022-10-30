@@ -15,18 +15,38 @@ function Fixture({ opId, homeTeam, awayTeam, status, goals, date }) {
         navigate(`/match/${opId}`)
       }}
     >
-      <div className="FixtureTeam">
-        <h1> {homeTeam.shortName} </h1>
-        <img src={homeTeam.logo} alt="" />
+      <div className="FixtureTeams">
+        <div className="FixtureTeam">
+          <img src={homeTeam.logo} alt="" />
+          <h1> {homeTeam.name} </h1>
+        </div>
+        <div className="FixtureTeam">
+          <img src={awayTeam.logo} alt="" />
+          <h1> {awayTeam.name}</h1>
+        </div>
       </div>
 
       <div className="FixtureTime">
-        <h1> {new Date(date).toTimeString().slice(0, 5)}</h1>
-        <h2> {new Date(date).toDateString().slice(0, 10)}</h2>
-      </div>
-      <div className="FixtureTeam">
-        <img src={awayTeam.logo} alt="" />
-        <h1> {awayTeam.shortName}</h1>
+        {goals.home || goals.home === 0 ? (
+          <div className="status">
+            <div className="score">
+              <div>{goals.home}</div>
+              <div>{goals.away}</div>
+            </div>
+
+            <div className="time">
+              <div>{status.elapsed}'</div>
+              <span>{status.long}</span>
+            </div>
+          </div>
+        ) : (
+          <h1>
+            {' '}
+            {status.short === 'NS'
+              ? new Date(date).toTimeString().slice(0, 5)
+              : status.short}
+          </h1>
+        )}
       </div>
     </div>
   )

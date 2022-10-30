@@ -5,7 +5,7 @@ import { FixturesContext } from '../matchcontext/fixturescontext'
 import { FixturesPageContext } from '../matchcontext/fixturespagecontext'
 const fetchFixtures = async ({ pageParam = 1 }) => {
   return axios
-    .get(`http://localhost:8000/api/matches?page=${pageParam}`)
+    .get(`https://plapi.onrender.com/api/matches?page=${pageParam}`)
     .then((res) => res.data)
 }
 

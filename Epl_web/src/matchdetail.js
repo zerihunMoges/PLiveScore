@@ -8,7 +8,9 @@ import Lineup from './components/lineup/lineup'
 import BasicTabs, { TabPanel } from './components/matchdetail/tabs'
 import { MatchContext } from './matchcontext/matchcontext'
 import { useMatch } from './queryhooks/useMatch'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
+import { Button, CircularProgress } from '@mui/material'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 function MatchDetail() {
   const [value, setValue] = useState(0)
@@ -20,11 +22,22 @@ function MatchDetail() {
     setValue(newValue)
   }
   const { data, status } = m
-
+  const navigate = useNavigate()
   return (
     <div>
+      <Button
+        variant="outlined"
+        onClick={() => navigate(-1)}
+        sx={{ margin: 1 }}
+      >
+        {' '}
+        <ArrowBackIosNewIcon />{' '}
+      </Button>
+
       {status === 'loading' ? (
-        <p>Loading</p>
+        <div className="loading">
+          <CircularProgress sx={{ margin: '1rem' }} />
+        </div>
       ) : status === 'success' ? (
         <div className="main">
           <div className="match">
@@ -73,7 +86,8 @@ function MatchDetail() {
                     {data.status.elapsed} mins
                   </div>
                   <div className="match-referee">
-                    Referee: <strong>Mike dean</strong>
+                    Referee:{' '}
+                    <strong>{data.referee ? data.referee : 'TBC'}</strong>
                   </div>
                   {/* <div className="match-bet-options">
               <button className="match-bet-option">1.48</button>
@@ -96,7 +110,7 @@ function MatchDetail() {
           <BasicTabs match={m} />
         </div>
       ) : (
-        <p>Wait </p>
+        <p>error </p>
       )}
     </div>
   )

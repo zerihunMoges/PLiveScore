@@ -5,8 +5,23 @@ ul {
 
 .lineups {
   display: flex;
+  justify-content: space-between;
 }
 
 .lineup {
-  width: 50%;
+  width: 48%;
+}
+
+.lineup.left {
+  border-right: solid rgb(146, 144, 144) 1px;
+}
+
+.lineuptext {
+  font-size: medium;
+  font-weight: 200;
+}
+
+.playername {
+  font-size: small;
+  font-weight: 100;
 }

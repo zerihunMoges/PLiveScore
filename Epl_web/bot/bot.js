@@ -1,12 +1,16 @@
-const token = '5473312446:AAGO_rKT1lnA-jH0EbV-pSJdRc-NJKMSL8g'
+require('dotenv').config()
+const token = process.env.BOTTOKEN
 
 const { Telegraf } = require('telegraf')
-const link = 'https://spontaneous-meringue-8b8f1c.netlify.app'
+const link = 'https://venerable-youtiao-6ebbe5.netlify.app'
 const bot = new Telegraf(token)
-bot.start((ctx) =>
-  ctx.reply('Welcome', {
-    reply_markup: { keyboard: [[{ text: 'Pl Live', web_app: { url: link } }]] }
+bot.start((ctx) => {
+  console.log(ctx.message)
+  ctx.reply('Click the button below to use Premier League Live Score Bot', {
+    reply_markup: {
+      inline_keyboard: [[{ text: 'Pl Live', web_app: { url: link } }]]
+    }
   })
-)
+})
 
 bot.launch()

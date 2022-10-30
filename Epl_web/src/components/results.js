@@ -19,13 +19,11 @@ import UpdateFixtures from '../helper/test'
 import { FixturesPageContext } from '../matchcontext/fixturespagecontext'
 import { useIsFetching } from 'react-query'
 import { useLiveMatches } from '../queryhooks/useLiveMatches'
-import ElevatedTabs from './header/header'
-const pageNumber = 1
-function Home() {
-  const [fixtures, setFixtures] = useContext(FixturesContext)
-  const [page, setPage] = useContext(FixturesPageContext)
+import useResults from '../queryhooks/useResults'
+
+function Results() {
   var prevDate
-  const liveMatches = useLiveMatches()
+
   const {
     isLoading,
     isSuccess,
@@ -36,8 +34,7 @@ function Home() {
     data,
     isError,
     error
-  } = useFixtures()
-
+  } = useResults()
   const observer = useRef()
   const loadingElementRef = useCallback(
     (node) => {
@@ -56,26 +53,6 @@ function Home() {
 
   return (
     <div className="main">
-      {liveMatches.data?.length > 0 ? (
-        <>
-          <h1 className="LiveMatchesHeader">Live Matches</h1>
-          <div className="LiveMatches">
-            {liveMatches.data?.map((match, index) => {
-              return (
-                <Match
-                  key={index}
-                  homeTeam={match.homeTeam}
-                  awayTeam={match.awayTeam}
-                  goals={match.goals}
-                  status={match.status}
-                  venue={match.venue}
-                />
-              )
-            })}
-          </div>
-        </>
-      ) : null}
-
       <div className="Fixtures">
         {data?.pages.map((page, i) =>
           page.data.map((match) => {
@@ -124,4 +101,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Results

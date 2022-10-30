@@ -8,6 +8,8 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { MatchProvider } from './matchcontext/matchcontext'
 import { FixturesProvider } from './matchcontext/fixturescontext'
 import { FixturesPageProvider } from './matchcontext/fixturespagecontext'
+import ElevatedTabs from './components/header/header'
+import { TabProvider } from './matchcontext/tabcontext'
 const queryClient = new QueryClient()
 const tele = window.Telegram.WebApp
 function App() {
@@ -15,20 +17,22 @@ function App() {
     tele.ready()
   })
   return (
-    <FixturesPageProvider>
-      <MatchProvider>
-        <FixturesProvider>
-          <QueryClientProvider client={queryClient}>
-            <Router>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/match/:id" element={<MatchDetail />} />
-              </Routes>
-            </Router>
-          </QueryClientProvider>
-        </FixturesProvider>
-      </MatchProvider>
-    </FixturesPageProvider>
+    <TabProvider>
+      <FixturesPageProvider>
+        <MatchProvider>
+          <FixturesProvider>
+            <QueryClientProvider client={queryClient}>
+              <Router>
+                <Routes>
+                  <Route path="/" element={<ElevatedTabs />} />
+                  <Route path="/match/:id" element={<MatchDetail />} />
+                </Routes>
+              </Router>
+            </QueryClientProvider>
+          </FixturesProvider>
+        </MatchProvider>
+      </FixturesPageProvider>
+    </TabProvider>
   )
 }
 

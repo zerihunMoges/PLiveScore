@@ -21,6 +21,7 @@ import { MatchContext } from '../../matchcontext/matchcontext'
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 import SportsIcon from '@mui/icons-material/Sports'
 import SwitchLeftIcon from '@mui/icons-material/SwitchLeft'
+import './tabs.css'
 export function TabPanel(props) {
   const { children, value, index, ...other } = props
 
@@ -66,7 +67,7 @@ export default function BasicTabs({ match }) {
     subst: <SwitchLeftIcon />
   }
   return !match ? (
-    <p>wait</p>
+    <p>error</p>
   ) : match.status === 'loading' ? (
     <p>Loading ...</p>
   ) : (
@@ -79,48 +80,47 @@ export default function BasicTabs({ match }) {
           scrollButtons
           allowScrollButtonsMobile
         >
-          <Tab label="Statistics" {...a11yProps(0)} />
+          {/* <Tab label="Statistics" {...a11yProps(0)} /> */}
           <Tab label="TimeLine" {...a11yProps(1)} />
           <Tab label={`${match.data.homeTeam.name} Lineup`} {...a11yProps(2)} />
           <Tab label={`${match.data.awayTeam.name} Lineup`} {...a11yProps(3)} />
         </Tabs>
       </Box>
 
-      <TabPanel value={value} index={1}>
-        <Timeline position="alternate" sx={{ fontSize: '5%' }}>
+      <TabPanel value={value} index={0}>
+        <Timeline className="timeline" position="right">
           {match.data.events.map((event, index) => {
             return (
-              <TimelineItem>
-                <TimelineOppositeContent
-                  sx={{ m: 'auto 0' }}
-                  align="right"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {event.time.elapsed}
-                </TimelineOppositeContent>
-                <TimelineSeparator>
-                  <TimelineConnector />
-                  <TimelineDot>{icons[event.type]}</TimelineDot>
-                  <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
-                    {event.type}
-                  </Typography>
-                  <Typography>{event.player.name}</Typography>
-                </TimelineContent>
-              </TimelineItem>
+              <div className="timelineitem">
+                <TimelineItem>
+                  <TimelineOppositeContent
+                    sx={{ m: 'auto 0' }}
+                    align="right"
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {event.time.elapsed}'
+                  </TimelineOppositeContent>
+                  <TimelineSeparator>
+                    <TimelineConnector />
+                    <TimelineDot>{icons[event.type]}</TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent sx={{ py: '12px', px: 2 }}>
+                    <h1 className="event-type">{event.type}</h1>
+
+                    <h2 className="player-name">{event.player.name}</h2>
+                    <h2 className="assist-name">{event.assist.name}</h2>
+                  </TimelineContent>
+                </TimelineItem>
+                <div></div>
+              </div>
             )
           })}
         </Timeline>
       </TabPanel>
 
-      <TabPanel value={value} index={0}>
-        Coming Soon!
-      </TabPanel>
-
-      <TabPanel value={value} index={2}>
+      <TabPanel value={value} index={1}>
         <Lineup
           startXI={match.data.lineups.home.startXI}
           substitutes={match.data.lineups.home.substitutes}
@@ -129,7 +129,7 @@ export default function BasicTabs({ match }) {
         />
       </TabPanel>
 
-      <TabPanel value={value} index={3}>
+      <TabPanel value={value} index={2}>
         <Lineup
           startXI={match.data.lineups.away.startXI}
           substitutes={match.data.lineups.away.substitutes}

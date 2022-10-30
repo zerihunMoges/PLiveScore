@@ -1,0 +1,26 @@
+/* .timeline {
+  width: 100%;
+  margin-right: auto;
+  justify-self: start;
+}
+
+.timelineitem {
+  display: flex;
+  justify-content: space-between;
+} */
+
+.event-type {
+  font-size: medium;
+  font-weight: 200;
+  margin: 0;
+}
+.player-name {
+  font-size: small;
+  font-weight: 150;
+  margin: 0;
+}
+.assist-name {
+  font-size: x-small;
+  font-weight: 50;
+  margin: 0;
+}

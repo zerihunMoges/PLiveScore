@@ -40,6 +40,7 @@ strong {
 
 .match {
   background-color: var(--color-bg-primary);
+  text-align: center;
   display: flex;
   flex-direction: column;
   min-width: 250px;

@@ -4,9 +4,9 @@ import cors from 'cors'
 import morgan from 'morgan'
 import { configs } from './configs'
 import { schedule } from './schedulers/schedulers'
+import { results } from './results'
 
 const fetch = require('node-fetch')
-let fixtures
 
 export async function updateAllMatches() {
   await fetch(
@@ -14,13 +14,14 @@ export async function updateAllMatches() {
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': 'c9c24aaae1msh17bea5214a85e53p1cee32jsn7cdd2fca8933',
+        'X-RapidAPI-Key': configs.apiTokens[configs.tokenIdx],
         'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
       }
     }
   )
     .then((res) => res.json())
     .then(async (data) => {
+      configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
       const { errors, paging, response } = data
       if (!errors || errors.length == 0) {
         for (const match of response) {
@@ -34,7 +35,7 @@ export async function updateAllMatches() {
               console.log(err)
             })
 
-          console.log(res)
+          await new Promise((r) => setTimeout(r, 1000))
         }
         var today = new Date()
         var tomorrow = new Date(
@@ -61,23 +62,15 @@ export async function updateTodaysMatch() {
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
+        'X-RapidAPI-Key': configs.apiTokens[configs.tokenIdx],
         'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
       }
     }
   ).then(async (res) => await res.json())
 
-  const { paging, response } = data
+  configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
 
-  fixtures = response
-  var today = new Date()
-  var tomorrow = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + 1
-  )
-  var dif = tomorrow.getTime() - today.getTime()
-  schedule(updateTodaysMatch, dif)
+  return data
 }
 
 export async function getFixture(id) {
@@ -87,13 +80,12 @@ export async function getFixture(id) {
       {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key':
-            '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
+          'X-RapidAPI-Key': configs.apiTokens[configs.tokenIdx],
           'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
         }
       }
     ).then(async (res) => await res.json())
-
+    configs.tokenIdx = (configs.tokenIdx + 1) % 10
     if (!data.errors || data.errors.length == 0) {
       await data.response.forEach(async (match) => {
         const { fixture, league, teams, goals, score, lineups, events } = match
@@ -101,6 +93,7 @@ export async function getFixture(id) {
           id,
           referee,
           timezone,
+
           date,
           timestamp,
           periods,
@@ -108,6 +101,7 @@ export async function getFixture(id) {
           status
         } = fixture
         console.log(teams.home.name)
+        console.log(new Date().toISOString())
         const res = await fetch(`${configs.api}/api/matches`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -116,8 +110,9 @@ export async function getFixture(id) {
           .then(async (res) => await res.json())
           .catch((err) => {
             console.log(err)
+            const time = 5000
+            schedule(getFixture, time, id)
           })
-
         const stoped = new Set([
           'PST',
           'CANC',
@@ -138,7 +133,13 @@ export async function getFixture(id) {
         } else if (status.short == 'NS') {
           const dif = new Date(date).getTime() - new Date().getTime()
           const time = dif
-          schedule(getFixture, Math.max(time, 30000), id)
+          if (lineups.home && lineups.home.startXI) {
+            schedule(getFixture, Math.max(time, 30000), id)
+          } else {
+            console.log('rescheduled' + teams.home.name)
+            const fiveMins = 300000
+            schedule(getFixture, fiveMins, id)
+          }
         } else if (inprogress.has(status.short)) {
           const time = 60000
           schedule(getFixture, time, id)
@@ -147,16 +148,18 @@ export async function getFixture(id) {
     } else return data
   } catch (err) {
     console.log(err)
+    const time = 5000
+    schedule(getFixture, time, id)
   }
 }
 
-schedule(updateAllMatches, 1)
+async function main() {
+  schedule(updateAllMatches, 1)
+  const { errors, paging, response } = await schedule(updateTodaysMatch, 1)
 
-if (fixtures == undefined) {
-  async function runFixture() {
-    await schedule(updateTodaysMatch, 1)
-
-    fixtures.forEach(async (match) => {
+  configs.tokenIdx = (configs.tokenIdx + 1) % configs.apiTokens.length
+  if (!errors.message) {
+    response.forEach(async (match) => {
       const matchTime = new Date(match.fixture.date).getTime()
       const hour = 3600000
 
@@ -170,7 +173,10 @@ if (fixtures == undefined) {
         )
       }
     })
+  } else {
+    const hour = 360000
+    schedule(main, hour)
   }
-
-  runFixture()
 }
+
+main()

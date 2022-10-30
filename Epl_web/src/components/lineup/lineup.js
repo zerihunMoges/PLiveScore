@@ -19,21 +19,21 @@ export default function Lineup({ startXI, formation, substitutes, coach }) {
   return (
     <div>
       <main className="lineups">
-        <div className="lineup">
-          <h3>Starting XI</h3>
+        <div className="lineup left">
+          <h1 className="lineuptext">Starting XI</h1>
           <ul>
             {startXI.map((pos) => (
-              <li>
+              <li className="playername">
                 {pos.player.number} {pos.player.name}
               </li>
             ))}
           </ul>
         </div>
         <div className="lineup">
-          <h3>Substitutes</h3>
+          <h1 className="lineuptext">Substitutes</h1>
           <ul>
             {substitutes.map((pos) => (
-              <li>
+              <li className="playername">
                 {pos.player.number} {pos.player.name}
               </li>
             ))}

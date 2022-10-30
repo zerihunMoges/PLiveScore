@@ -1,9 +1,9 @@
 import axios from 'axios'
 import { useQuery } from 'react-query'
 const fetchMatch = (matchId) => {
-  console.log(`https://epl-update.onrender.com/api/matches/${matchId}`)
+  console.log(`https://plapi.onrender.com/api/matches/${matchId}`)
   return axios
-    .get(`http://localhost:8000/api/matches/${matchId}`)
+    .get(`https://plapi.onrender.com/api/matches/${matchId}`)
     .then((res) => res.data)
 }
 

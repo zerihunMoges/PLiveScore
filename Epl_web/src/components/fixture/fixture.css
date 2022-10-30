@@ -2,18 +2,23 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   background-color: rgba(255, 255, 255, 0.938);
   margin: 0.2rem;
+  padding: 0.2rem 1rem 0.2rem 1rem;
   width: 100%;
   border-width: 1px;
   border-color: rgb(22, 22, 22);
+  border-radius: 1rem;
+  text-align: center;
 }
-
+.FixtureTeams {
+  width: 70%;
+}
 .FixtureTeam {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -25,6 +30,21 @@
 .FixtureTime {
   align-items: center;
   margin: 1rem;
+}
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.score {
+  margin-right: 1rem;
+  justify-content: space-between;
+}
+.status .time {
+  font-size: x-small;
+  font-weight: 100;
+  border-left: solid rgb(204, 203, 203) 1px;
+  padding-left: 0.5rem;
 }
 .FixtureTime h1 {
   font-size: small;
