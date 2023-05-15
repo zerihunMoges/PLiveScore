@@ -1,7 +1,3 @@
-import express, { response } from 'express'
-import bodyParser, { urlencoded } from 'body-parser'
-import cors from 'cors'
-import morgan from 'morgan'
 import { configs } from './configs'
 import { schedule } from './schedulers/schedulers'
 
@@ -10,21 +6,22 @@ let fixtures
 
 export async function updateAllMatches() {
   await fetch(
-    `https://api-football-beta.p.rapidapi.com/fixtures?league=39&season=2022`,
+    `${configs.sourceBaseUrl}/fixtures?league=39&season=2022`,
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': 'c9c24aaae1msh17bea5214a85e53p1cee32jsn7cdd2fca8933',
-        'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
+        'X-RapidAPI-Key': configs.apiKey,
+        'X-RapidAPI-Host': configs.apiHost
       }
     }
   )
     .then((res) => res.json())
     .then(async (data) => {
       const { errors, paging, response } = data
-      if (!errors || errors.length == 0) {
+      console.log(data)
+      if (response) {
         for (const match of response) {
-          const res = await fetch(`${configs.api}/api/matches`, {
+          const res = await fetch(`${configs.destBaseUrl}/api/matches`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ match: match })
@@ -55,14 +52,14 @@ export async function updateAllMatches() {
 }
 export async function updateTodaysMatch() {
   const data = await fetch(
-    `https://api-football-beta.p.rapidapi.com/fixtures?league=39&season=2022&date=${new Date()
+    `${configs.sourceBaseUrl}/fixtures?league=39&season=2022&date=${new Date()
       .toISOString()
       .slice(0, 10)}`,
     {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
-        'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
+        'X-RapidAPI-Key': configs.apiKey,
+        'X-RapidAPI-Host': configs.apiHost
       }
     }
   ).then(async (res) => await res.json())
@@ -83,13 +80,13 @@ export async function updateTodaysMatch() {
 export async function getFixture(id) {
   try {
     const data = await fetch(
-      `https://api-football-beta.p.rapidapi.com/fixtures?id=${id}`,
+      `${configs.sourceBaseUrl}/fixtures?id=${id}`,
       {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key':
-            '611c8372d4mshde05757227cb5b5p1643f2jsnd22c7dd860c2',
-          'X-RapidAPI-Host': 'api-football-beta.p.rapidapi.com'
+            configs.apiKey,
+          'X-RapidAPI-Host': configs.apiHost
         }
       }
     ).then(async (res) => await res.json())
@@ -108,7 +105,7 @@ export async function getFixture(id) {
           status
         } = fixture
         console.log(teams.home.name)
-        const res = await fetch(`${configs.api}/api/matches`, {
+        const res = await fetch(`${configs.destBaseUrl}/api/matches`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ match: data.response[0] })
@@ -150,27 +147,26 @@ export async function getFixture(id) {
   }
 }
 
-schedule(updateAllMatches, 1)
 
-if (fixtures == undefined) {
-  async function runFixture() {
-    await schedule(updateTodaysMatch, 1)
 
-    fixtures.forEach(async (match) => {
-      const matchTime = new Date(match.fixture.date).getTime()
-      const hour = 3600000
+export default async function runService() {
+  await schedule(updateAllMatches, 1)
+  await schedule(updateTodaysMatch, 1)
 
-      if (matchTime - new Date().getTime() <= hour) {
-        schedule(getFixture, 1, match.fixture.id)
-      } else {
-        schedule(
-          getFixture,
-          matchTime - new Date().getTime() - hour,
-          match.fixture.id
-        )
-      }
-    })
-  }
+  fixtures.forEach(async (match) => {
+    const matchTime = new Date(match.fixture.date).getTime()
+    const hour = 3600000
 
-  runFixture()
+    if (matchTime - new Date().getTime() <= hour) {
+      schedule(getFixture, 1, match.fixture.id)
+    } else {
+      schedule(
+        getFixture,
+        matchTime - new Date().getTime() - hour,
+        match.fixture.id
+      )
+    }
+  })
 }
+
+

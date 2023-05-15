@@ -1,5 +1,7 @@
 require('dotenv').config()
 export const configs = {
-  port: process.env.PORT || 3000,
-  api: process.env.API
+  sourceBaseUrl: process.env.SOURCEBASEURL,
+  destBaseUrl: process.env.DESTBASEURL,
+  apiKey: process.env.APIKEY,
+  apiHost: process.env.APIHOST
 }
